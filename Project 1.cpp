@@ -6,15 +6,32 @@
 #include <algorithm>
 #include <stdlib.h>
 
-using namespace std;//
+using namespace std;
 
+//hard-coded template states
 vector<vector<int>> goalState = {{1, 2, 3},  
                                  {4, 5, 6},
                                  {7, 8, 0}}; 
 
+vector<vector<int>> impossible = {{1, 4, 3},  
+                                  {2, 5, 0},
+                                  {6, 7, 8}};
+
 vector<vector<int>> failed = {{0, 0, 0},  
                               {0, 0, 0},
                               {0, 0, 0}};
+
+vector<vector<int>> VeryEasy = {{1, 2, 3},  
+                                {4, 5, 6},
+                                {7, 0, 8}};
+
+vector<vector<int>> Easy = {{1, 2, 3},  
+                            {5, 0, 6},
+                            {4, 7, 8}};
+
+vector<vector<int>> Hard = {{1, 6, 7},  
+                            {5, 0, 3},
+                            {4, 8, 2}};
 
 struct Node
 {
@@ -26,7 +43,7 @@ struct Node
     
 };
 
-struct Heuristic // comparator class
+struct Heuristic // comparator class for constructing the priority queue
 {
     bool operator()(const Node &a, const Node &b)
     {
@@ -34,7 +51,7 @@ struct Heuristic // comparator class
     }
 };
 
-int getHeuristic(int whichHeur, vector<vector<int>> temp)
+int getHeuristic(int whichHeur, vector<vector<int>> temp)//this function gets the h(n) value for each puzzle
 {
     int heur = 0;
 
@@ -51,20 +68,20 @@ int getHeuristic(int whichHeur, vector<vector<int>> temp)
                 { 
                     if (temp[i][j] != 0)
                     {
-                        heur++;
+                        heur++;//counts number of misplaced tiles in the puzzle
                     }
                 }
            }
         }
     }
 
-    if (whichHeur == 3)//manhattan distance
+    if (whichHeur == 3)//manhattan distance heuristc
     {
        for(int i = 0; i < temp.size(); i++){
             for(int j = 0; j < temp.size(); j++){
                 if (temp[i][j] != goalState[i][j])
                 { 
-                    if (temp[i][j] != 0)
+                    if (temp[i][j] != 0)//gets the distance of each misplaced tile to the goal state and adds it to h(n)
                     {
                         if (temp[i][j] == 1)
                         {
@@ -106,14 +123,14 @@ int getHeuristic(int whichHeur, vector<vector<int>> temp)
 
     return heur;
 }
-Node Get0Position(vector<vector<int>> child)
-{
+Node Get0Position(vector<vector<int>> child) // finds the position of the "0" and updates the nodes with it
+{// this function is really only needed for the initial state
     Node temp;
-    temp.puzzle = child;
+    temp.puzzle = child; 
     
     for(int i = 0; i < temp.puzzle.size(); i++){
         for(int j = 0; j < temp.puzzle.size(); j++){
-            if(temp.puzzle[i][j] == 0){// finds the position of the "0" 
+            if(temp.puzzle[i][j] == 0){
                 temp.PositionOfZeroRow = i;
                 temp.PositionOfZeroColumn = j;
             }
@@ -123,7 +140,7 @@ Node Get0Position(vector<vector<int>> child)
     return temp;
 }
 
-Node search(vector<vector<int>> problem, int whichHeuristic)
+Node search(vector<vector<int>> problem, int whichHeuristic)//main search function
 {   
     priority_queue<Node, vector<Node>, Heuristic> test;
     set<vector<vector<int>>> trackDupes;
@@ -131,12 +148,12 @@ Node search(vector<vector<int>> problem, int whichHeuristic)
     Node currstate;
     Node temp;
     Node failstate;
-    failstate.puzzle = failed;
+    failstate.puzzle = failed; // making a hardcoded fail state just for the function to return something
     int maxQueueSize = test.size();
     int numNodesExpanded = 0;
     int tempNum = 0;
 
-    temp = (Get0Position(problem));
+    temp = (Get0Position(problem));/// initializing the first state
     temp.heuristic = getHeuristic(whichHeuristic, problem);
     test.push(temp);
     trackDupes.insert(problem);
@@ -147,10 +164,11 @@ Node search(vector<vector<int>> problem, int whichHeuristic)
         maxQueueSize = max(maxQueueSize, tempNum);
 
         currstate = test.top();
-        trackDupes.insert(currstate.puzzle);
+        trackDupes.insert(currstate.puzzle); 
 
+        test.pop();
         numNodesExpanded++;
-        
+
         if (currstate.puzzle == goalState)
         {
             
@@ -162,8 +180,8 @@ Node search(vector<vector<int>> problem, int whichHeuristic)
                     cout << currstate.puzzle[i][j] << " ";
                 }
             }
-
-            cout << endl << "Solution depth was " << currstate.solutionPath.size() << endl;
+            cout << "\nGoal state!\n";
+            cout << "Solution depth was " << currstate.solutionPath.size() << endl;
             cout << "Number of nodes expanded: " << numNodesExpanded-1 << endl;
             cout << "Max queue size: " << maxQueueSize << endl;
 
@@ -178,10 +196,10 @@ Node search(vector<vector<int>> problem, int whichHeuristic)
                 cout << currstate.puzzle[i][j] << " ";
             }
         }
-
+        
         cout << endl;
 
-        test.pop();
+        cout << "The best state to expand with a g(n) = " << currstate.solutionPath.size() << " and h(n) = " << currstate.heuristic << " is ";
 
         if (currstate.PositionOfZeroColumn != 0) //checks if can swap left
         {   
@@ -191,9 +209,9 @@ Node search(vector<vector<int>> problem, int whichHeuristic)
             temp.puzzle[temp.PositionOfZeroRow][temp.PositionOfZeroColumn-1] = 0; //sets 0 to the position of the swapped number
             temp.PositionOfZeroColumn--;
 
-            dupeSize = trackDupes.size();
+            dupeSize = trackDupes.size(); //checking dupes
             trackDupes.insert(temp.puzzle);
-            if (dupeSize != trackDupes.size())
+            if (dupeSize != trackDupes.size()) //if not duped, ready to push and update node's attributes
             {
                 temp.heuristic = getHeuristic(whichHeuristic, temp.puzzle);
                 temp.solutionPath.push_back("Left");
@@ -258,8 +276,6 @@ Node search(vector<vector<int>> problem, int whichHeuristic)
 
     }
 
-    cout << endl << "No Solution" << endl;
-
     return failstate;
 }
 
@@ -269,11 +285,76 @@ int main(){
     Node end;
     int heuristic = 0;
     int input;
+    int input2;
+    int input3;
 
-    vector<vector<int>> example = {{1, 3, 6},  
-                                   {5, 0, 7},
-                                   {4, 8, 2}}; 
-    cout << "Problem:";
+    vector<vector<int>> example= {{1, 2, 3},  
+                                  {5, 0, 6},
+                                  {4, 7, 8}}; 
+    
+    cout << endl << "David Liu's 8-Puzzle Solver\n\n";
+    cout <<"========================================================\n\n";
+    cout << "Enter \"1\" for a default puzzle or \"2\" to create a custom puzzle\n";
+    cin >> input;
+
+    if (input == 1)
+    {
+        cout << "Choose a default puzzle by entering the number: " << endl;
+        cout << "1. Already Solved\n"; //goalstate already
+        cout << "2. Very Easy\n"; //depth 1 puzzle
+        cout << "3. Easy\n"; // depth 4 puzzle in the project details
+        cout << "4. Hard\n"; // depth 16 puzle in the project details
+        cout << "5. Literally Impossible\n"; //unsolvable config
+
+        cin >> input;
+
+        if (input == 1)
+        {
+            example = goalState;
+        }
+        else if (input == 2)
+        {
+            example = VeryEasy;
+        }
+        else if (input == 3)
+        {
+            example = Easy;
+        }
+        else if (input == 4)
+        {
+            example = Hard;
+        }
+        else if (input == 5)
+        {
+            example = impossible;
+        }
+
+    }
+    else if (input == 2)
+    {
+        cout << "Enter the configuration of your puzzle and enter a \"0\" for the blank\n";
+        cout << "Enter 3 numbers at a time separating them with a space\n";
+        cout << "First Row:  ";
+        cin >> input >> input2 >> input3;
+
+        example[0][0] = input;
+        example[0][1] = input2;
+        example[0][2] = input3;
+
+        cout << "\nSecond Row: ";
+        cin >> input >> input2 >> input3;
+
+        example[1][0] = input;
+        example[1][1] = input2;
+        example[1][2] = input3;
+
+        cout << "\nThird Row:  ";
+        cin >> input >> input2 >> input3;
+
+        example[2][0] = input;
+        example[2][1] = input2;
+        example[2][2] = input3;
+    }
 
     for(int i = 0; i < example.size(); i++){
         cout<<endl;
@@ -284,7 +365,7 @@ int main(){
 
     cout <<endl;
 
-    cout << "Enter the number of the algorithm you wish to search with: " << endl;
+    cout << "\nEnter the number of the algorithm you wish to search with: " << endl;
 
     cout << "1. Uniform Cost Search\n" << "2. Misplaced Tile Heuristic\n" << "3. Manhattan Distance Heuristic\n\n";
 
@@ -294,46 +375,11 @@ int main(){
 
     end = search(example, heuristic);
 
-    /*
-    if (end.puzzle != failed)
-    {
-        for(int i = 0; i < end.puzzle.size(); i++){
-            cout << endl;
-            for(int j = 0; j < end.puzzle.size(); j++){
-              cout << end.puzzle[i][j] << " ";
-           }
-        }
-
-        cout<< endl << "Solution Path:" << endl;
-
-        for (int i = 0; i < end.solutionPath.size(); i++)
-        {
-            cout << end.solutionPath[i]<< " ";
-        }
-
-        cout<< endl;
-
-        cout << "Depth: " << end.solutionPath.size()<<endl;
-
-        cout << "NumMisplaced Tiles: " <<end.NumMisplacedTiles<<endl;
-
-    }
-
-    */
-
     if (end.puzzle == failed)
     {
         cout << "No Solution" << endl;
     }
-    /*
-    else{
-        cout << "Solution Path: ";
-        for (int i = 0; i < end.solutionPath.size(); i++)
-        {
-            cout << end.solutionPath[i]<< " ";
-        }
-    }
-        */
+
     return 0;
 }
 
