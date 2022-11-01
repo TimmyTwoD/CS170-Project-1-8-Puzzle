@@ -4,6 +4,7 @@
 #include <string>
 #include <set>
 #include <algorithm>
+#include <stdlib.h>
 
 using namespace std;//
 
@@ -51,6 +52,52 @@ int getHeuristic(int whichHeur, vector<vector<int>> temp)
                     if (temp[i][j] != 0)
                     {
                         heur++;
+                    }
+                }
+           }
+        }
+    }
+
+    if (whichHeur == 3)//manhattan distance
+    {
+       for(int i = 0; i < temp.size(); i++){
+            for(int j = 0; j < temp.size(); j++){
+                if (temp[i][j] != goalState[i][j])
+                { 
+                    if (temp[i][j] != 0)
+                    {
+                        if (temp[i][j] == 1)
+                        {
+                            heur += i+j;
+                        }
+                        if (temp[i][j] == 2)
+                        {
+                            heur += i + abs(j-1);
+                        }
+                        if (temp[i][j] == 3)
+                        {
+                            heur += i + abs(j-2);
+                        }
+                        if (temp[i][j] == 4)
+                        {
+                            heur += abs(i-1) + j;
+                        }
+                        if (temp[i][j] == 5)
+                        {
+                            heur += abs(i-1) + abs(j-1);
+                        }
+                        if (temp[i][j] == 6)
+                        {
+                            heur += abs(i-1) + abs(j-2);
+                        }
+                        if (temp[i][j] == 7)
+                        {
+                            heur += abs(i-2) + j;
+                        }
+                        if (temp[i][j] == 8)
+                        {
+                            heur += abs(i-2) + abs(j-1);
+                        }
                     }
                 }
            }
@@ -223,9 +270,9 @@ int main(){
     int heuristic = 0;
     int input;
 
-    vector<vector<int>> example = {{1, 2, 3},  
-                                   {5, 0, 6},
-                                   {4, 7, 8}}; 
+    vector<vector<int>> example = {{1, 3, 6},  
+                                   {5, 0, 7},
+                                   {4, 8, 2}}; 
     cout << "Problem:";
 
     for(int i = 0; i < example.size(); i++){
