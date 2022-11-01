@@ -44,39 +44,17 @@ int getHeuristic(int whichHeur, vector<vector<int>> temp)
 
     if (whichHeur == 2)
     {
-        if (temp[0][0] != 1)//finds the number of misplaced tiles 
-        {
-            heur++;
+       for(int i = 0; i < temp.size(); i++){
+            for(int j = 0; j < temp.size(); j++){
+                if (temp[i][j] != goalState[i][j])
+                { 
+                    if (temp[i][j] != 0)
+                    {
+                        heur++;
+                    }
+                }
+           }
         }
-        if (temp[0][1] != 2)
-        {
-            heur++;
-        }
-        if (temp[0][2] != 3)
-        {
-            heur++;
-        }
-        if (temp[1][0] != 4)
-        {
-            heur++;
-        }
-        if (temp[1][1] != 5)
-        {
-            heur++;
-        }
-        if (temp[1][2] != 6)
-        {
-            heur++;
-        }
-        if (temp[2][0] != 7)
-        {
-            heur++;
-        }
-        if (temp[2][1] != 8)
-        {
-            heur++;
-        }
-
     }
 
     return heur;
@@ -245,9 +223,9 @@ int main(){
     int heuristic = 0;
     int input;
 
-    vector<vector<int>> example = {{1, 6, 7},  
-                                   {5, 0, 3},
-                                   {4, 8, 2}}; 
+    vector<vector<int>> example = {{1, 2, 3},  
+                                   {5, 0, 6},
+                                   {4, 7, 8}}; 
     cout << "Problem:";
 
     for(int i = 0; i < example.size(); i++){
