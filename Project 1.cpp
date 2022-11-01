@@ -25,11 +25,11 @@ struct Node
     
 };
 
-struct Heuristic
+struct Heuristic // comparator class
 {
     bool operator()(const Node &a, const Node &b)
     {
-        return ((a.heuristic + a.solutionPath.size()) > (b.heuristic+ b.solutionPath.size()));
+        return ((a.heuristic + a.solutionPath.size()) > (b.heuristic+ b.solutionPath.size())); 
     }
 };
 
@@ -42,7 +42,7 @@ int getHeuristic(int whichHeur, vector<vector<int>> temp)
         heur = 0;
     }
 
-    if (whichHeur == 2)
+    if (whichHeur == 2)//misplaced tile heuristic
     {
        for(int i = 0; i < temp.size(); i++){
             for(int j = 0; j < temp.size(); j++){
