@@ -5,6 +5,7 @@
 #include <set>
 #include <algorithm>
 #include <stdlib.h>
+#include <time.h>
 
 using namespace std;
 
@@ -142,6 +143,7 @@ Node Get0Position(vector<vector<int>> child) // finds the position of the "0" an
 
 Node search(vector<vector<int>> problem, int whichHeuristic)//main search function
 {   
+    clock_t tStart = clock();
     priority_queue<Node, vector<Node>, Heuristic> test;
     set<vector<vector<int>>> trackDupes;
     int dupeSize;
@@ -184,10 +186,13 @@ Node search(vector<vector<int>> problem, int whichHeuristic)//main search functi
             cout << "Solution depth was " << currstate.solutionPath.size() << endl;
             cout << "Number of nodes expanded: " << numNodesExpanded-1 << endl;
             cout << "Max queue size: " << maxQueueSize << endl;
+            printf("Time taken: %.3fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+
 
             return currstate;
         }
 
+        /*
         for(int i = 0; i < currstate.puzzle.size(); i++)
         {
             cout << endl;
@@ -200,6 +205,7 @@ Node search(vector<vector<int>> problem, int whichHeuristic)//main search functi
         cout << endl;
 
         cout << "The best state to expand with a g(n) = " << currstate.solutionPath.size() << " and h(n) = " << currstate.heuristic << " is ";
+        */
 
         if (currstate.PositionOfZeroColumn != 0) //checks if can swap left
         {   
