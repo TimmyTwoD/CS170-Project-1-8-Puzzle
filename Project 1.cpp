@@ -24,7 +24,7 @@ vector<vector<int>> failed = {{0, 0, 0},
 
 vector<vector<int>> VeryEasy = {{1, 2, 3},  
                                 {4, 5, 6},
-                                {7, 0, 8}};
+                                {0, 7, 8}};
 
 vector<vector<int>> Easy = {{1, 2, 3},  
                             {5, 0, 6},
@@ -192,7 +192,7 @@ Node search(vector<vector<int>> problem, int whichHeuristic)//main search functi
             return currstate;
         }
 
-        /*
+        
         for(int i = 0; i < currstate.puzzle.size(); i++)
         {
             cout << endl;
@@ -205,7 +205,7 @@ Node search(vector<vector<int>> problem, int whichHeuristic)//main search functi
         cout << endl;
 
         cout << "The best state to expand with a g(n) = " << currstate.solutionPath.size() << " and h(n) = " << currstate.heuristic << " is ";
-        */
+        
 
         if (currstate.PositionOfZeroColumn != 0) //checks if can swap left
         {   
